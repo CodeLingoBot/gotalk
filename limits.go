@@ -18,7 +18,7 @@ type Limits interface {
   decStreamReq()
 }
 
-// Create new Limits, limiting request processing.
+// NewLimits; Create new Limits, limiting request processing.
 //
 // `streamRequestLimit` limits the amount of stream requests but works together with `requestLimit`
 // meaning that we can handle `requestLimit` requests of any type, but no more than

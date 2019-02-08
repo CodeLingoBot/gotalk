@@ -59,19 +59,19 @@ func Handle(op string, fn interface{}) {
   DefaultHandlers.Handle(op, fn)
 }
 
-// Handle operation with raw input and output buffers. If `op` is empty, handle
+// HandleBufferRequest; operation with raw input and output buffers. If `op` is empty, handle
 // all requests which doesn't have a specific handler registered.
 func HandleBufferRequest(op string, fn BufferReqHandler) {
   DefaultHandlers.HandleBufferRequest(op, fn)
 }
 
-// Handle operation by reading and writing directly from/to the underlying stream.
+// HandleStreamRequest; operation by reading and writing directly from/to the underlying stream.
 // If `op` is empty, handle all requests which doesn't have a specific handler registered.
 func HandleStreamRequest(op string, fn StreamReqHandler) {
   DefaultHandlers.HandleStreamRequest(op, fn)
 }
 
-// Handle notifications of a certain name with automatic JSON encoding of values.
+// HandleNotification notifications of a certain name with automatic JSON encoding of values.
 //
 // `fn` must conform to one of the following signatures:
 //   func(s *Sock, name string, v interface{}) -- takes socket, name and parameters
@@ -84,7 +84,7 @@ func HandleNotification(name string, fn interface{}) {
   DefaultHandlers.HandleNotification(name, fn)
 }
 
-// Handle notifications of a certain name with raw input buffers. If `name` is empty, handle
+// HandleBufferNotification notifications of a certain name with raw input buffers. If `name` is empty, handle
 // all notifications which doesn't have a specific handler registered.
 func HandleBufferNotification(name string, fn BufferNoteHandler) {
   DefaultHandlers.HandleBufferNotification(name, fn)
@@ -97,12 +97,12 @@ type streamReqHandlerMap map[string]StreamReqHandler
 type noteHandlerMap      map[string]BufferNoteHandler
 
 
-// See Handle()
+// Handle; See Handle()
 func (h *Handlers) Handle(op string, fn interface{}) {
   h.HandleBufferRequest(op, wrapFuncReqHandler(fn))
 }
 
-// See HandleBufferRequest()
+// HandleBufferRequest; See HandleBufferRequest()
 func (h *Handlers) HandleBufferRequest(op string, fn BufferReqHandler) {
   h.bufReqHandlersMu.Lock()
   defer h.bufReqHandlersMu.Unlock()
@@ -113,7 +113,7 @@ func (h *Handlers) HandleBufferRequest(op string, fn BufferReqHandler) {
   }
 }
 
-// See HandleStreamRequest()
+// HandleStreamRequest; See HandleStreamRequest()
 func (h *Handlers) HandleStreamRequest(op string, fn StreamReqHandler) {
   h.streamReqHandlersMu.Lock()
   defer h.streamReqHandlersMu.Unlock()
@@ -124,12 +124,12 @@ func (h *Handlers) HandleStreamRequest(op string, fn StreamReqHandler) {
   }
 }
 
-// See HandleNotification()
+// HandleNotification; See HandleNotification()
 func (h *Handlers) HandleNotification(name string, fn interface{}) {
   h.HandleBufferNotification(name, wrapFuncNotHandler(fn))
 }
 
-// See HandleBufferNotification()
+// HandleBufferNotification; See HandleBufferNotification()
 func (h *Handlers) HandleBufferNotification(name string, fn BufferNoteHandler) {
   h.notesMu.Lock()
   defer h.notesMu.Unlock()
@@ -140,7 +140,7 @@ func (h *Handlers) HandleBufferNotification(name string, fn BufferNoteHandler) {
   }
 }
 
-// Look up a single-buffer handler for operation `op`. Returns `nil` if not found.
+// FindBufferRequestHandler; Look up a single-buffer handler for operation `op`. Returns `nil` if not found.
 func (h *Handlers) FindBufferRequestHandler(op string) BufferReqHandler {
   h.bufReqHandlersMu.RLock()
   defer h.bufReqHandlersMu.RUnlock()
@@ -150,7 +150,7 @@ func (h *Handlers) FindBufferRequestHandler(op string) BufferReqHandler {
   return h.bufReqFallbackHandler
 }
 
-// Look up a stream handler for operation `op`. Returns `nil` if not found.
+// FindStreamRequestHandler; Look up a stream handler for operation `op`. Returns `nil` if not found.
 func (h *Handlers) FindStreamRequestHandler(op string) StreamReqHandler {
   h.streamReqHandlersMu.RLock()
   defer h.streamReqHandlersMu.RUnlock()
@@ -160,7 +160,7 @@ func (h *Handlers) FindStreamRequestHandler(op string) StreamReqHandler {
   return h.streamReqFallbackHandler
 }
 
-// Look up a handler for notification `name`. Returns `nil` if not found.
+// FindNotificationHandler; Look up a handler for notification `name`. Returns `nil` if not found.
 func (h *Handlers) FindNotificationHandler(name string) BufferNoteHandler {
   h.notesMu.RLock()
   defer h.notesMu.RUnlock()

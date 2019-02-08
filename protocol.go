@@ -37,12 +37,12 @@ const (
 // Protocol message type
 type MsgType byte
 
-// Write the version this protocol implements to `s`
+// WriteVersion; the version this protocol implements to `s`
 func WriteVersion(s io.Writer) (int, error) {
   return s.Write(protocolVersionBuf[:])
 }
 
-// Read the version the other end implements. Returns an error if this side's protocol
+// ReadVersion; the version the other end implements. Returns an error if this side's protocol
 // is incompatible with the other side's version.
 func ReadVersion(s io.Reader) (uint8, error) {
   b := make([]byte, 2)
@@ -64,7 +64,7 @@ func ReadVersion(s io.Reader) (uint8, error) {
 var HeartbeatMsgMaxLoad = 0xffff
 
 
-// Create a slice of bytes representing a heartbeat message
+// MakeHeartbeatMsg; Create a slice of bytes representing a heartbeat message
 func MakeHeartbeatMsg(load uint16) []byte {
   b := []byte{byte(MsgTypeHeartbeat),0,0,0,0,0,0,0,0,0,0,0,0}
   z := 1
@@ -75,7 +75,7 @@ func MakeHeartbeatMsg(load uint16) []byte {
 }
 
 
-// Create a slice of bytes representing a message (w/o any payload)
+// MakeMsg; Create a slice of bytes representing a message (w/o any payload)
 func MakeMsg(t MsgType, id, name3 string, wait, size int) []byte {
   // calculate buffer size
   bz := 9  // minimum size, fitting type and payload size
@@ -134,7 +134,7 @@ func MakeMsg(t MsgType, id, name3 string, wait, size int) []byte {
 }
 
 
-// Read a message from `s`
+// ReadMsg; a message from `s`
 // If t is MsgTypeHeartbeat, wait==load, size==time
 func ReadMsg(s io.Reader) (t MsgType, id, name3 string, wait, size uint32, err error) {
   // "r0001004echo00000005"  => ('r', "0001", "echo", 0, 5, nil)
@@ -232,7 +232,7 @@ func ReadMsg(s io.Reader) (t MsgType, id, name3 string, wait, size uint32, err e
 }
 
 
-// Returns a 4-byte representation of a 32-bit integer, suitable an integer-based request ID.
+// FormatRequestID returns a 4-byte representation of a 32-bit integer, suitable an integer-based request ID.
 func FormatRequestID(n uint32) []byte {
   buf := bytes.NewBuffer(make([]byte,4)[:0])
   err := binary.Write(buf, binary.LittleEndian, n)
@@ -283,7 +283,7 @@ func rShiftSlice(b []byte, n int, padb byte) {
 }
 
 
-// Read exactly len(b) bytes from s, blocking if needed
+// readn; exactly len(b) bytes from s, blocking if needed
 func readn(s io.Reader, b []byte) (int, error) {
   // behaves similar to io.ReadFull, but simpler and allowing EOF<len(b)
   p := 0

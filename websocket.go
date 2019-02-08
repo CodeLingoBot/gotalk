@@ -71,7 +71,7 @@ func (s *WebSocketServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
   }
 }
 
-// Handler that can be used with the http package
+// WebSocketHandler; that can be used with the http package
 func WebSocketHandler() *WebSocketServer {
   server := &WebSocketServer{
     Limits:   DefaultLimits,

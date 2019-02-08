@@ -68,7 +68,7 @@ func NewSock(h *Handlers) *Sock {
 }
 
 
-// Creates two sockets which are connected to eachother without any resource limits.
+// Pipe creates two sockets which are connected to eachother without any resource limits.
 // If `handlers` is nil, DefaultHandlers are used. If `limits` is nil, DefaultLimits are used.
 func Pipe(handlers *Handlers, limits Limits) (*Sock, *Sock, error) {
   if handlers == nil {
@@ -121,7 +121,7 @@ func (s *Sock) Connect(how, addr string, limits Limits) error {
   return nil
 }
 
-// Access the socket's underlying connection
+// Conn access the socket's underlying connection
 func (s *Sock) Conn() io.ReadWriteCloser {
   return s.conn
 }
@@ -229,7 +229,7 @@ func (s *Sock) writeMsgString(t MsgType, id, op string, wait int, str string) er
 }
 
 
-// Send a single-buffer request. A response should be received from reschan.
+// SendRequest; a single-buffer request. A response should be received from reschan.
 func (s *Sock) SendRequest(r *Request, reschan chan Response) error {
   id := s.allocResChan(reschan)
   if err := s.writeMsg(r.MsgType, id, r.Op, 0, r.Data); err != nil {
@@ -243,7 +243,7 @@ func (s *Sock) SendRequest(r *Request, reschan chan Response) error {
 }
 
 
-// Send a single-buffer request, wait for and return the response.
+// BufferRequest; Send a single-buffer request, wait for and return the response.
 // Automatically retries the request if needed.
 func (s *Sock) BufferRequest(op string, buf []byte) ([]byte, error) {
   reschan := make(chan Response)
@@ -271,7 +271,7 @@ func (s *Sock) BufferRequest(op string, buf []byte) ([]byte, error) {
 }
 
 
-// Send a single-value request where the input and output values are JSON-encoded
+// Request; Send a single-value request where the input and output values are JSON-encoded
 func (s *Sock) Request(op string, in interface{}, out interface{}) error {
   inbuf, err := json.Marshal(in)
   if err != nil {
@@ -285,7 +285,7 @@ func (s *Sock) Request(op string, in interface{}, out interface{}) error {
 }
 
 
-// Send a multi-buffer streaming request
+// StreamRequest; Send a multi-buffer streaming request
 func (s *Sock) StreamRequest(op string) (*StreamRequest, chan Response) {
   reschan := make(chan Response)
   id := s.allocResChan(reschan)
@@ -293,12 +293,12 @@ func (s *Sock) StreamRequest(op string) (*StreamRequest, chan Response) {
 }
 
 
-// Send a single-buffer notification
+// BufferNotify; Send a single-buffer notification
 func (s *Sock) BufferNotify(name string, buf []byte) error {
   return s.writeMsg(MsgTypeNotification, "", name, 0, buf)
 }
 
-// Send a single-value request where the value is JSON-encoded
+// Notify; Send a single-value request where the value is JSON-encoded
 func (s *Sock) Notify(name string, v interface{}) error {
   if buf, err := json.Marshal(v); err != nil {
     return err
@@ -546,7 +546,7 @@ func (s *Sock) readNotification(name string, size int) error {
 }
 
 
-// Before reading any messages over a socket, handshake must happen. This function will block
+// Handshake; Before reading any messages over a socket, handshake must happen. This function will block
 // until the handshake either succeeds or fails.
 func (s *Sock) Handshake() error {
   // Write, read and compare version
@@ -618,7 +618,7 @@ type netLocalAddressable interface {
 }
 
 
-// After completing a succesful handshake, call this function to read messages received to this
+// Read; After completing a succesful handshake, call this function to read messages received to this
 // socket. Does not return until the socket is closed.
 // If HeartbeatInterval > 0 this method also sends automatic heartbeats.
 func (s *Sock) Read(limits Limits) error {
@@ -732,7 +732,7 @@ func (s *Sock) Read(limits Limits) error {
 }
 
 
-// Address of this socket
+// Addr; of this socket
 func (s *Sock) Addr() string {
   if s.conn != nil {
     if netconn, ok := s.conn.(net.Conn); ok {
@@ -743,7 +743,7 @@ func (s *Sock) Addr() string {
 }
 
 
-// Close this socket because of a protocol error
+// CloseError; socket because of a protocol error
 func (s *Sock) CloseError(code int) error {
   if s.conn != nil {
     s.closeCode = code

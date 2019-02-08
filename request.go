@@ -6,7 +6,7 @@ type Request struct {
   Data []byte
 }
 
-// Creates a new single request
+// NewRequest creates a new single request
 func NewRequest(op string, buf []byte) *Request {
   return &Request{MsgTypeSingleReq, op, buf}
 }

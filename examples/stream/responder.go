@@ -9,7 +9,7 @@ import (
   "errors"
 )
 
-// Fecth a random joke from an external API
+// fetchRandomJoke; Fecth a random joke from an external API
 func fetchRandomJoke() (string, error) {
   r, err := http.Get("http://api.icndb.com/jokes/random")
   if err != nil {

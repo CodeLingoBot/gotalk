@@ -35,7 +35,7 @@ type Server struct {
 }
 
 
-// Create a new server already listening on `l`
+// NewServer; Create a new server already listening on `l`
 func NewServer(h *Handlers, limits Limits, l net.Listener) *Server {
   return &Server{Handlers:h, Limits:limits, listener:l}
 }
@@ -56,7 +56,7 @@ func (ln tcpKeepAliveListener) Accept() (c net.Conn, err error) {
 }
 
 
-// Start a `how` server listening for connections at `addr`. You need to call Accept() on the
+// Listen starts a `how` server listening for connections at `addr`. You need to call Accept() on the
 // returned socket to start accepting connections. `how` and `addr` are passed to `net.Listen()`
 // and thus any values accepted by net.Listen are valid.
 // The returned server has Handlers=DefaultHandlers and Limits=DefaultLimits set.
@@ -91,7 +91,7 @@ func Listen(how, addr string) (*Server, error) {
 }
 
 
-// Start a `how` server accepting connections at `addr`
+// Serve starts a `how` server accepting connections at `addr`
 func Serve(how, addr string, acceptHandler SockHandler) error {
   s, err := Listen(how, addr)
   if err != nil {
@@ -140,7 +140,7 @@ func (s *Server) accept(c net.Conn) {
 }
 
 
-// Address this server is listening at
+// Addr; server is listening at
 func (s *Server) Addr() string {
   if s.listener != nil {
     return s.listener.Addr().String()
@@ -149,7 +149,7 @@ func (s *Server) Addr() string {
 }
 
 
-// Stop listening for and accepting connections
+// Close; Stop listening for and accepting connections
 func (s *Server) Close() error {
   if s.listener != nil {
     err := s.listener.Close()
